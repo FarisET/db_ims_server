@@ -39,7 +39,7 @@ router.get('/fetchIncidentsResolved', (req,res) => {
     });
 });
 
-router.get('analytics/fetchTotalIncidentsOnTypes', (req,res) => {
+router.get('/fetchTotalIncidentsOnTypes', (req,res) => {
     const query='call getTotalIncidentsOnTypes()';
     con.query(query, (error,results) => {
         if(error){
@@ -81,6 +81,28 @@ router.get('/fetchTotalIncidentsOnLocations', (req,res) => {
         console.log(result.length)
         console.log(result)      
         return res.status(200).json(result);
+    });
+});
+
+router.get('/fetchEfficiency', (req, res) => {
+    const query = 'call getEfficiency()';
+    con.query(query, (error, results) => {
+        if (error) {
+            console.log(error);
+            console.log('error in fetching efficiency');
+            return res.status(500).json({ status: 'Internal Server Error' });
+        }
+
+        // Convert values to strings to preserve decimal places
+        const data = results[0].map(entry => ({
+            action_team_name: entry.action_team_name,
+            efficiency_value: entry.efficiency_value.toFixed(2) + ' %' // Assuming 2 decimal places
+        }));
+
+        console.log(data.length);
+        console.log(data);
+
+        return res.status(200).json(data);
     });
 });
 
