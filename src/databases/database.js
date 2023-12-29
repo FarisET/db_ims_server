@@ -7,7 +7,7 @@ var con =mysql.createConnection({
     password:'Root#123',
     database:'test1',
     ssl  : {
-        ca : fs.readFileSync('C:\\Users\\hp\\Desktop\\DigiCertGlobalRootCA.crt.pem') // Path to your SSL certificate
+        ca : process.env.MYSQL_SSL_CERT // Path to your SSL certificate
     }
 })
 
