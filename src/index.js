@@ -10,7 +10,7 @@ const adminRoutes=require('./routes/admin');
 //Use the CORS middleware to allow requests from your Flutter app
 app.use(cors());
 // Settings
-app.set('port', process.env.PORT || 3000);
+// app.set('port', process.env.PORT || 8080);
 
 // Middlewares
 app.use(express.json());
@@ -28,10 +28,7 @@ app.use('/admin', adminRoutes);
 
 
 
-
-// Starting the server
-app.listen(app.get('port'), () => {
-    const serverURL = `http://localhost:${app.get('port')}`; 
-    console.log(serverURL);
-    console.log('Server on port', app.get('port'));
+const port = process.env.PORT || 3000;
+app.listen(port, () => {
+    console.log(`http://localhost:${port}`);
 });

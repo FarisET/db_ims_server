@@ -13,7 +13,7 @@ router.get('/dashboard/fetchAllUserReports', (req,res) => {
     con.query(query,[status1,status2],(error, results) => {
         if(error){
             console.log(error);
-            return res.status(500).json({ status: 'Internal server error' });
+            return res.status(500).json({ status: 'Internal server error', error: error.message });
         }
         var result = JSON.parse(JSON.stringify(results));
         console.log(result.length)
