@@ -53,4 +53,4 @@ jobs:
           app-name: 'Safify-Test-v1'
           slot-name: 'Production'
           package: .
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_340F7054F6DB4DF69A86D05762BFE4F5 }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_DBACD18CD03F42A0BE09BC619ECFC945 }}
