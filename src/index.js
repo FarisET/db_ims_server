@@ -15,6 +15,10 @@ app.set('port', process.env.PORT || 3000);
 // Middlewares
 app.use(express.json());
 
+//landing page
+app.get('/', (req, res) => {
+    res.send('backend is running');
+});
 // Routes
 app.use('/user', userRoutes);
 app.use('/userReport', userReportRoutes);
