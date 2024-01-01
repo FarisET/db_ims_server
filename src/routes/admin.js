@@ -110,6 +110,20 @@ router.post('/dashboard/insertAssignTask' , (req,res) => {
     });
 });
 
+router.delete('/dashboard/:user_report_id',(req,res) =>{
+    const user_report_id = req.params.user_report_id;
+    const query = 'delete from user_report where user_report_id=?';
+    con.query(query,[user_report_id],(error,result) =>{
+        if(error){
+            console.log(error);
+            console.log('error deleting user report');
+            return res.status(500).json({status: 'Internal Server Error'});
+        }
+        console.log(result);
+        return res.status(200).json({status: 'deleted user report'});
+    });
+})
+
 router.post('/dashboard/approvedActionReport', (req,res) => {
     const user_report_id=req.body.user_report_id;
     const action_report_id=req.body.action_report_id;
