@@ -15,7 +15,16 @@ router.get('/dashboard/fetchAllUserReports', (req,res) => {
             console.log(error);
             return res.status(500).json({ status: 'Internal server error', error: error.message });
         }
-        var result = JSON.parse(JSON.stringify(results));
+        const reportsWithBase64Images = results.map(report => {
+            // Check if report.image is not null
+            if (report.image) {
+                // Convert BLOB to base64
+                const imageBase64 = Buffer.from(report.image).toString('base64');
+                report.image = `data:image/png;base64,${imageBase64}`; // Assuming the image is in png format
+            }
+            return report;
+        });
+        var result = JSON.parse(JSON.stringify(reportsWithBase64Images));
         console.log(result.length)
         console.log(result)      
         return res.status(200).json(result);
@@ -44,7 +53,21 @@ router.get('/dashboard/fetchAllActionReports', (req,res) => {
             console.log(error);
             return res.status(500).json({ status: 'Internal server error' });
         }
-        var result = JSON.parse(JSON.stringify(results));
+        const reportsWithBase64Images = results.map(report => {
+            // Check if report.image is not null
+            if (report.surrounding_image) {
+                // Convert BLOB to base64
+                const imageBase64 = Buffer.from(report.surrounding_image).toString('base64');
+                report.surrounding_image = `data:image/png;base64,${imageBase64}`; // Assuming the image is in png format
+            }
+            if (report.proof_image) {
+                // Convert BLOB to base64
+                const imageBase64 = Buffer.from(report.proof_image).toString('base64');
+                report.proof_image = `data:image/png;base64,${imageBase64}`; // Assuming the image is in png format
+            }
+            return report;
+        });
+        var result = JSON.parse(JSON.stringify(reportsWithBase64Images));
         console.log(result.length)
         console.log(result)      
         return res.status(200).json(result);
@@ -110,7 +133,7 @@ router.post('/dashboard/insertAssignTask' , (req,res) => {
     });
 });
 
-router.delete('/dashboard/:user_report_id',(req,res) =>{
+router.delete('/dashboard/deleteUserReport/:user_report_id',(req,res) =>{
     const user_report_id = req.params.user_report_id;
     const query = 'delete from user_report where user_report_id=?';
     con.query(query,[user_report_id],(error,result) =>{
@@ -122,7 +145,21 @@ router.delete('/dashboard/:user_report_id',(req,res) =>{
         console.log(result);
         return res.status(200).json({status: 'deleted user report'});
     });
-})
+});
+
+router.delete('/dashboard/deleteActionReport/:action_report_id',(req,res) =>{
+    const action_report_id = req.params.action_report_id;
+    const query = 'delete from action_report where action_report_id=?';
+    con.query(query,[action_report_id],(error,result) =>{
+        if(error){
+            console.log(error);
+            console.log('error deleting action report');
+            return res.status(500).json({status: 'Internal Server Error'});
+        }
+        console.log(result);
+        return res.status(200).json({status: 'deleted action report'});
+    });
+});
 
 router.post('/dashboard/approvedActionReport', (req,res) => {
     const user_report_id=req.body.user_report_id;
