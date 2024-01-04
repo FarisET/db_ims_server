@@ -15,18 +15,18 @@ router.get('/dashboard/fetchAllUserReports', (req,res) => {
             console.log(error);
             return res.status(500).json({ status: 'Internal server error', error: error.message });
         }
-        const reportsWithBase64Images = results.map(report => {
-            // Check if report.image is not null
-            if (report.image) {
-                // Convert BLOB to base64
-                console.log(report.image);
-                const imageBase64 = Buffer.from(report.image).toString('base64');
-                report.image = `data:image/png;base64,${imageBase64}`; // Assuming the image is in png format
-                console.log(report.image);
-            }
-            return report;
-        });
-        var result = JSON.parse(JSON.stringify(reportsWithBase64Images));
+        // const reportsWithBase64Images = results.map(report => {
+        //     // Check if report.image is not null
+        //     if (report.image) {
+        //         // Convert BLOB to base64
+        //         console.log(report.image);
+        //         const imageBase64 = Buffer.from(report.image).toString('base64');
+        //         report.image = `data:image/png;base64,${imageBase64}`; // Assuming the image is in png format
+        //         console.log(report.image);
+        //     }
+        //     return report;
+        // });
+        var result = JSON.parse(JSON.stringify(results));
         console.log(result.length)
         console.log(result)      
         return res.status(200).json(result);
@@ -55,25 +55,25 @@ router.get('/dashboard/fetchAllActionReports', (req,res) => {
             console.log(error);
             return res.status(500).json({ status: 'Internal server error' });
         }
-        const reportsWithBase64Images = results.map(report => {
-            // Check if report.image is not null
-            if (report.surrounding_image) {
-                // Convert BLOB to base64
-                console.log(report.surrounding_image);
-                const imageBase64 = Buffer.from(report.surrounding_image).toString('base64');
-                report.surrounding_image = `data:image/png;base64,${imageBase64}`; // Assuming the image is in png format
-                console.log(report.surrounding_image);
-            }
-            if (report.proof_image) {
-                // Convert BLOB to base64
-                console.log(report.proof_image);
-                const imageBase64 = Buffer.from(report.proof_image).toString('base64');
-                report.proof_image = `data:image/png;base64,${imageBase64}`; // Assuming the image is in png format
-                console.log(report.proof_image);
-            }
-            return report;
-        });
-        var result = JSON.parse(JSON.stringify(reportsWithBase64Images));
+        // const reportsWithBase64Images = results.map(report => {
+        //     // Check if report.image is not null
+        //     if (report.surrounding_image) {
+        //         // Convert BLOB to base64
+        //         console.log(report.surrounding_image);
+        //         const imageBase64 = Buffer.from(report.surrounding_image).toString('base64');
+        //         report.surrounding_image = `data:image/png;base64,${imageBase64}`; // Assuming the image is in png format
+        //         console.log(report.surrounding_image);
+        //     }
+        //     if (report.proof_image) {
+        //         // Convert BLOB to base64
+        //         console.log(report.proof_image);
+        //         const imageBase64 = Buffer.from(report.proof_image).toString('base64');
+        //         report.proof_image = `data:image/png;base64,${imageBase64}`; // Assuming the image is in png format
+        //         console.log(report.proof_image);
+        //     }
+        //     return report;
+        // });
+        var result = JSON.parse(JSON.stringify(results));
         console.log(result.length)
         console.log(result)      
         return res.status(200).json(result);

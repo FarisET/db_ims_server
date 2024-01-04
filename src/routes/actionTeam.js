@@ -49,28 +49,112 @@ const upload = multer({ storage: multer.memoryStorage() }).fields([
 //     })
 // });
 
-router.post('/dashboard/:userid/MakeActionReport', (req,res) => {
-    const reported_by=req.body.reported_by;
-    const surrounding_image=req.body.surrounding_image;
-    const report_description=req.body.report_description;
-    const question_one=req.body.question_one;
-    const question_two=req.body.question_two;
-    const question_three=req.body.question_three;
-    const question_four=req.body.question_four;
-    const question_five=req.body.question_five;
-    const resolution_description=req.body.resolution_description;
-    const proof_image=req.body.proof_image;
-    const user_report_id=req.body.user_report_id;
-    const action_team_id=req.params.userid;
-    // const jsondate_time=req.body.date_time;
-    console.log(action_team_id);
+// router.post('/dashboard/:userid/MakeActionReport', (req,res) => {
+//     const reported_by=req.body.reported_by;
+//     const surrounding_image=req.body.surrounding_image;
+//     const report_description=req.body.report_description;
+//     const question_one=req.body.question_one;
+//     const question_two=req.body.question_two;
+//     const question_three=req.body.question_three;
+//     const question_four=req.body.question_four;
+//     const question_five=req.body.question_five;
+//     const resolution_description=req.body.resolution_description;
+//     const proof_image=req.body.proof_image;
+//     const user_report_id=req.body.user_report_id;
+//     const action_team_id=req.params.userid;
+//     // const jsondate_time=req.body.date_time;
+//     console.log(action_team_id);
 
-    //convert date_time to mysql format
-    // const momentobj=moment(jsondate_time,moment.ISO_8601);
-    // const mysqldatetime=momentobj.format('YYYY-MM-DD HH:mm:ss');
-    // Convert the base64 image to binary data (Buffer)
+//     //convert date_time to mysql format
+//     // const momentobj=moment(jsondate_time,moment.ISO_8601);
+//     // const mysqldatetime=momentobj.format('YYYY-MM-DD HH:mm:ss');
+//     // Convert the base64 image to binary data (Buffer)
+//     const query1='select getActionTeamIDfromUserID(?) as action_team_id';
+//     con.query(query1,[action_team_id],(error,results1) => {
+//         if (error) {
+//             console.log(error);
+//             console.log('Error fetching action_team_id');
+//             return res.status(500).json({ status: 'error fetching action_team_id' });
+//         }
+
+//         if (results1.length === 0 || !results1[0].action_team_id) {
+//             console.log('Action team ID not found for the user');
+//             return res.status(404).json({ status: 'action_team_id not found' });
+//         }
+//         const actionTeamId = results1[0].action_team_id;
+//         const values=[];
+//         values.push(reported_by);
+
+//         if(surrounding_image){
+//             const imageBufferBinaryForm1 = Buffer.from(surrounding_image, 'base64');
+//             values.push(imageBufferBinaryForm1);
+//         }else values.push(null);
+
+//         values.push(report_description);
+
+//         if(question_one){
+//             values.push(question_one);
+//         }else values.push(null);
+
+//         if(question_two){
+//             values.push(question_two);
+//         }else values.push(null);
+
+//         if(question_three){
+//             values.push(question_three);
+//         }else values.push(null);
+
+//         if(question_four){
+//             values.push(question_four);
+//         }else values.push(null);
+
+//         if(question_five){
+//             values.push(question_five);
+//         }else values.push(null);
+
+//         values.push(resolution_description);
+
+//         const imageBufferBinaryForm2 = Buffer.from(proof_image, 'base64');
+//         console.log(imageBufferBinaryForm2);
+//         values.push(imageBufferBinaryForm2);
+        
+//         values.push(user_report_id);
+//         values.push(actionTeamId);
+
+//         const query='insert into action_report(reported_by,surrounding_image,report_description, question_one, question_two, question_three, question_four, question_five, resolution_description, proof_image, user_report_id, action_team_id) values (?,?,?,?,?,?,?,?,?,?,?,?)';
+//         // const values=[report_description,question_one,question_two,question_three,question_four,question_five,resolution_description,imageBufferBinaryForm,user_report_id,action_team_id];
+//         con.query(query, values, (error,results2) => {
+//             if(error){
+//                 console.log(error);
+//                 console.log('error in making action report');
+//                 return res.status(500).json({status: 'error inserting'});
+//             }
+//             console.log(results2)
+//             return res.status(200).json({status: 'report submitted'});
+//         })
+//     })
+    
+// });
+
+router.post('/dashboard/:userid/MakeActionReport', upload, async (req, res) => {
+    const reported_by = req.body.reported_by;
+    const report_description = req.body.report_description;
+    const question_one = req.body.question_one;
+    const question_two = req.body.question_two;
+    const question_three = req.body.question_three;
+    const question_four = req.body.question_four;
+    const question_five = req.body.question_five;
+    const resolution_description = req.body.resolution_description;
+    const user_report_id = req.body.user_report_id;
+    const action_team_id = req.params.userid;
+    // const jsondate_time = req.body.date_time;
+    
+    // const momentobj = moment(jsondate_time, moment.ISO_8601);
+    // const mysqldatetime = momentobj.format('YYYY-MM-DD HH:mm:ss');
+    var surroundingImageUrl = null;
+    var proofImageUrl = null;
     const query1='select getActionTeamIDfromUserID(?) as action_team_id';
-    con.query(query1,[action_team_id],(error,results1) => {
+    con.query(query1,[action_team_id],async(error,results1) => {
         if (error) {
             console.log(error);
             console.log('Error fetching action_team_id');
@@ -84,12 +168,16 @@ router.post('/dashboard/:userid/MakeActionReport', (req,res) => {
         const actionTeamId = results1[0].action_team_id;
         const values=[];
         values.push(reported_by);
-
-        if(surrounding_image){
-            const imageBufferBinaryForm1 = Buffer.from(surrounding_image, 'base64');
-            values.push(imageBufferBinaryForm1);
-        }else values.push(null);
-
+        try{
+            if (req.files.surrounding_image && req.files.surrounding_image[0]) {
+                const uploadResult1 = await uploadImage(req.files.surrounding_image[0].buffer);
+                surroundingImageUrl = uploadResult1.url;
+                console.log(surroundingImageUrl);
+            }
+            values.push(surroundingImageUrl);
+        }catch(error){
+            return res.status(500).json({ error: 'Failed to upload surrouning image' });
+        }
         values.push(report_description);
 
         if(question_one){
@@ -113,11 +201,16 @@ router.post('/dashboard/:userid/MakeActionReport', (req,res) => {
         }else values.push(null);
 
         values.push(resolution_description);
-
-        const imageBufferBinaryForm2 = Buffer.from(proof_image, 'base64');
-        console.log(imageBufferBinaryForm2);
-        values.push(imageBufferBinaryForm2);
-        
+        try{
+            if (req.files.proof_image && req.files.proof_image[0]) {
+                const uploadResult2 = await uploadImage(req.files.proof_image[0].buffer);
+                proofImageUrl = uploadResult2.url;
+                console.log(proofImageUrl);
+            }
+            values.push(proofImageUrl);
+        }catch(error){
+            return res.status(500).json({ error: 'Failed to upload proof image' });
+        }
         values.push(user_report_id);
         values.push(actionTeamId);
 
@@ -131,97 +224,8 @@ router.post('/dashboard/:userid/MakeActionReport', (req,res) => {
             }
             console.log(results2)
             return res.status(200).json({status: 'report submitted'});
-        })
-    })
-    
-});
-
-router.post('/dashboard/:userid/MakeActionReport', upload, async (req, res) => {
-    const reported_by = req.body.reported_by;
-    const report_description = req.body.report_description;
-    const question_one = req.body.question_one;
-    const question_two = req.body.question_two;
-    const question_three = req.body.question_three;
-    const question_four = req.body.question_four;
-    const question_five = req.body.question_five;
-    const resolution_description = req.body.resolution_description;
-    const user_report_id = req.body.user_report_id;
-    const action_team_id = req.params.userid;
-    const jsondate_time = req.body.date_time;
-    
-    const momentobj = moment(jsondate_time, moment.ISO_8601);
-    const mysqldatetime = momentobj.format('YYYY-MM-DD HH:mm:ss');
-    let surroundingImageUrl = null;
-    let proofImageUrl = null;
-    const query1='select getActionTeamIDfromUserID(?) as action_team_id';
-    con.query(query1,[action_team_id],(error,results1) => {
-        if (error) {
-            console.log(error);
-            console.log('Error fetching action_team_id');
-            return res.status(500).json({ status: 'error fetching action_team_id' });
-        }
-
-        if (results1.length === 0 || !results1[0].action_team_id) {
-            console.log('Action team ID not found for the user');
-            return res.status(404).json({ status: 'action_team_id not found' });
-        }
-        const actionTeamId = results1[0].action_team_id;
-        const values=[];
-        values.push(reported_by);
-        try{
-            if (req.files.surrounding_image && req.files.surrounding_image[0]) {
-                const uploadResult1 = uploadImage(req.files.surrounding_image[0].buffer);
-                surroundingImageUrl = uploadResult1.url;
-            }
-            values.push(surroundingImageUrl);
-        }catch(error){
-            return res.status(500).json({ error: 'Failed to upload surrouning image' });
-        }
-        try{
-            if (req.files.proof_image && req.files.proof_image[0]) {
-                const uploadResult2 = uploadImage(req.files.proof_image[0].buffer);
-                proofImageUrl = uploadResult2.url;
-            }
-        }catch(error){
-            return res.status(500).json({ error: 'Failed to upload proof image' });
-        }
-
-    });
-
-    try {
-        let surroundingImageUrl = null;
-        let proofImageUrl = null;
-        if (req.files.surrounding_image && req.files.surrounding_image[0]) {
-            const uploadResult1 = await uploadImage(req.files.surrounding_image[0].buffer);
-            surroundingImageUrl = uploadResult1.url;
-        }
-        if (req.files.proof_image && req.files.proof_image[0]) {
-            const uploadResult2 = await uploadImage(req.files.proof_image[0].buffer);
-            proofImageUrl = uploadResult2.url;
-        }
-
-        const query1 = 'select getActionTeamIDfromUserID(?) as action_team_id';
-        con.query(query1, [action_team_id], (error, results1) => {
-            if (error) {
-                return res.status(500).json({ status: 'error fetching action_team_id' });
-            }
-            if (results1.length === 0 || !results1[0].action_team_id) {
-                return res.status(404).json({ status: 'action_team_id not found' });
-            }
-            const actionTeamId = results1[0].action_team_id;
-            const values = [reported_by, surroundingImageUrl, report_description, question_one, question_two, question_three, question_four, question_five, resolution_description, proofImageUrl, user_report_id, actionTeamId];
-
-            const query = 'insert into action_report(reported_by, surrounding_image, report_description, question_one, question_two, question_three, question_four, question_five, resolution_description, proof_image, user_report_id, action_team_id) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
-            con.query(query, values, (error, results2) => {
-                if (error) {
-                    return res.status(500).json({ status: 'error inserting' });
-                }
-                return res.status(200).json({ status: 'report submitted' });
-            });
         });
-    } catch (error) {
-        return res.status(500).json({ error: 'Failed to upload' });
-    }
+    });
 });
 
 
@@ -237,16 +241,16 @@ router.get('/dashboard/:userid/fetchAssignedTasks', (req,res) => {
             console.log(error);
             return res.status(500).json({ status: 'Internal server error' });
         }
-        const reportsWithBase64Images = results.map(report => {
-            // Check if report.image is not null
-            if (report.image) {
-                // Convert BLOB to base64
-                const imageBase64 = Buffer.from(report.image).toString('base64');
-                report.image = `data:image/png;base64,${imageBase64}`; // Assuming the image is in png format
-            }
-            return report;
-        });
-        var result = JSON.parse(JSON.stringify(reportsWithBase64Images));
+        // const reportsWithBase64Images = results.map(report => {
+        //     // Check if report.image is not null
+        //     if (report.image) {
+        //         // Convert BLOB to base64
+        //         const imageBase64 = Buffer.from(report.image).toString('base64');
+        //         report.image = `data:image/png;base64,${imageBase64}`; // Assuming the image is in png format
+        //     }
+        //     return report;
+        // });
+        var result = JSON.parse(JSON.stringify(results));
         console.log(result.length)
         console.log(result)      
         return res.status(200).json(result);

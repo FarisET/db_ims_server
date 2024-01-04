@@ -121,16 +121,16 @@ router.get('/dashboard/:userid/reports', (req,res) => {
             console.log(error);
             return res.status(500).json({ status: 'Internal server error' });
         }
-        const reportsWithBase64Images = results.map(report => {
-            // Check if report.image is not null
-            if (report.image) {
-                // Convert BLOB to base64
-                const imageBase64 = Buffer.from(report.image).toString('base64');
-                report.image = `data:image/png;base64,${imageBase64}`; // Assuming the image is in png format
-            }
-            return report;
-        });
-        var result = JSON.parse(JSON.stringify(reportsWithBase64Images));
+        // const reportsWithBase64Images = results.map(report => {
+        //     // Check if report.image is not null
+        //     if (report.image) {
+        //         // Convert BLOB to base64
+        //         const imageBase64 = Buffer.from(report.image).toString('base64');
+        //         report.image = `data:image/png;base64,${imageBase64}`; // Assuming the image is in png format
+        //     }
+        //     return report;
+        // });
+        var result = JSON.parse(JSON.stringify(results));
         console.log(result.length)
         console.log(result)      
         return res.status(200).json(result);
