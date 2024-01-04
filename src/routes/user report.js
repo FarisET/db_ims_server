@@ -103,7 +103,13 @@ var con=require('../databases/database');
 const { route } = require('express/lib/application');
 const bodyParser = require('body-parser');
 const moment = require('moment');
+const multer = require('multer');
+const cloudinary = require('../utils/cloudinaryUtil').cloudinary;
+const uploadImage = require('../utils/cloudinaryUtil').uploadImage;
 //123
+// Configure Multer
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage }).single('image');
 
 router.get('/dashboard/:userid/reports', (req,res) => {
     const userid=req.params.userid;
@@ -131,33 +137,67 @@ router.get('/dashboard/:userid/reports', (req,res) => {
     });
 });
 
-router.post('/dashboard/:userid/MakeReport', (req,res) => {
-    const report_description=req.body.report_description;
-    const jsondate_time=req.body.date_time;
-    const sub_location_id=req.body.sub_location_id;
-    const incident_subtype_id=req.body.incident_subtype_id;
-    const incident_criticality_id=req.body.incident_criticality_id;
-    const image=req.body.image;
-    const user_id=req.params.userid;
-    console.log(user_id);
+// router.post('/dashboard/:userid/MakeReport',(req,res) => {
+//     const report_description=req.body.report_description;
+//     const jsondate_time=req.body.date_time;
+//     const sub_location_id=req.body.sub_location_id;
+//     const incident_subtype_id=req.body.incident_subtype_id;
+//     const incident_criticality_id=req.body.incident_criticality_id;
+//     const image=req.body.image;
+//     const user_id=req.params.userid;
+//     console.log(user_id);
 
-    //convert date_time to mysql format
-    const momentobj=moment(jsondate_time,moment.ISO_8601);
-    const mysqldatetime=momentobj.format('YYYY-MM-DD HH:mm:ss');
-    // Convert the base64 image to binary data (Buffer)
-    const imageBufferBinaryForm = Buffer.from(image, 'base64');
+//     //convert date_time to mysql format
+//     const momentobj=moment(jsondate_time,moment.ISO_8601);
+//     const mysqldatetime=momentobj.format('YYYY-MM-DD HH:mm:ss');
+//     // Convert the base64 image to binary data (Buffer)
+//     const imageBufferBinaryForm = Buffer.from(image, 'base64');
 
-    const query='insert into user_report(report_description, date_time, incident_subtype_id, sub_location_id, incident_criticality_id, image, user_id) values (?,?,?,?,?,?,?)';
-    const values=[report_description,mysqldatetime,incident_subtype_id,sub_location_id,incident_criticality_id,imageBufferBinaryForm,user_id];
-    con.query(query, values, (error,results) => {
-        if(error){
-            console.log(error);
-            console.log('error in making report');
-            return res.status(500).json({status: 'error inserting'});
+//     const query='insert into user_report(report_description, date_time, incident_subtype_id, sub_location_id, incident_criticality_id, image, user_id) values (?,?,?,?,?,?,?)';
+//     const values=[report_description,mysqldatetime,incident_subtype_id,sub_location_id,incident_criticality_id,imageBufferBinaryForm,user_id];
+//     con.query(query, values, (error,results) => {
+//         if(error){
+//             console.log(error);
+//             console.log('error in making report');
+//             return res.status(500).json({status: 'error inserting'});
+//         }
+//         console.log(results)
+//         return res.status(200).json({status: 'report submitted'});
+//     })
+// });
+
+router.post('/dashboard/:userid/MakeReport', upload, async (req, res) => {
+    const report_description = req.body.report_description;
+    const jsondate_time = req.body.date_time;
+    const sub_location_id = req.body.sub_location_id;
+    const incident_subtype_id = req.body.incident_subtype_id;
+    const incident_criticality_id = req.body.incident_criticality_id;
+    const user_id = req.params.userid;
+
+    // Convert date_time to MySQL format
+    const momentobj = moment(jsondate_time, moment.ISO_8601);
+    const mysqldatetime = momentobj.format('YYYY-MM-DD HH:mm:ss');
+
+    try {
+        let uploadedUrl = null;
+        if (req.file) {
+            const uploadResult = await uploadImage(req.file.buffer);
+            uploadedUrl = uploadResult.url;
         }
-        console.log(results)
-        return res.status(200).json({status: 'report submitted'});
-    })
+
+        const query = 'INSERT INTO user_report(report_description, date_time, incident_subtype_id, sub_location_id, incident_criticality_id,image,user_id) VALUES (?, ?, ?, ?, ?,?,?)';
+        const values = [report_description, mysqldatetime, incident_subtype_id, sub_location_id, incident_criticality_id,uploadedUrl,user_id];
+        con.query(query, values, (error, results) => {
+            if (error) {
+                console.log(error);
+                return res.status(500).json({ status: 'error inserting' });
+            }
+            return res.status(200).json({ status: 'report submitted', imageUrl: uploadedUrl });
+        });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ error: 'Failed to upload' });
+    }
 });
 
 router.get('/dashboard/fetchsublocations', (req,res) => {

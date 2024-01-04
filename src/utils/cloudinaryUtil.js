@@ -10,9 +10,18 @@ cloudinary.config({
     api_secret: 'Zbj9rxDNOWJCAFzGjRe0IGI0Qio'
 });
 
-module.exports.uploadImage = async (fileStream, fileName) => {
-    const result = await uploadStream(fileStream, fileName);
-    return result;
+// module.exports.uploadImage = async (fileStream, fileName) => {
+//     const result = await uploadStream(fileStream, fileName);
+//     return result;
+// }
+module.exports.uploadImage = async (imageBuffer, fileName) => {
+    try {
+        const result = await cloudinary.uploader.upload(`data:image/jpeg;base64,${imageBuffer.toString('base64')}`, { public_id: fileName });
+        return result;
+    } catch (error) {
+        console.error('Error uploading to Cloudinary:', error);
+        throw error;
+    }
 }
 
 module.exports.getResized = (imageName) => {

@@ -6,6 +6,7 @@ const userReportRoutes=require('./routes/user report');
 const actionTeamRoutesRoutes=require('./routes/actionTeam');
 const analyticsRoutes=require('./routes/analytics');
 const adminRoutes=require('./routes/admin');
+const cloudinary=require('./routes/imageUpload');
 
 //Use the CORS middleware to allow requests from your Flutter app
 app.use(cors());
@@ -25,6 +26,7 @@ app.use('/userReport', userReportRoutes);
 app.use('/actionTeam', actionTeamRoutesRoutes);
 app.use('/analytics', analyticsRoutes);
 app.use('/admin', adminRoutes);
+app.use('/img',cloudinary);
 
 
 
