@@ -145,7 +145,7 @@ router.post('/dashboard/:userid/MakeActionReport', upload, async (req, res) => {
     const question_four = req.body.question_four;
     const question_five = req.body.question_five;
     const resolution_description = req.body.resolution_description;
-    const user_report_id = req.body.user_report_id;
+    const user_report_id = parseInt(req.body.user_report_id, 10);
     const action_team_id = req.params.userid;
     // const jsondate_time = req.body.date_time;
     

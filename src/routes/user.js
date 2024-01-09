@@ -48,6 +48,7 @@ const jwt = require("jsonwebtoken");
 router.post('/login', (req, res) => {
   const id=req.body.user_id;
   const password=req.body.user_pass; 
+  console.log(id, password);
     // Assuming the client sends id and password in the request body  
     // Query the database to find a user with the provided id
     con.query('SELECT * FROM users u join user_role r on u.role_id=r.role_id WHERE user_id = ? and user_pass=?', [id,password], (error, rows) => {
@@ -55,6 +56,7 @@ router.post('/login', (req, res) => {
         console.log(error);
         return res.status(500).json({ status: 'Internal server error' });
       }
+      console.log(rows);
       const user = rows[0];
       // Check if a user with the provided id exists
       if (rows.length === 0) {
