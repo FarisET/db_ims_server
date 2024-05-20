@@ -51,8 +51,9 @@ router.post('/login', (req, res) => {
   console.log(id, password);
     // Assuming the client sends id and password in the request body  
     // Query the database to find a user with the provided id
-    con.query('SELECT * FROM users u join user_role r on u.role_id=r.role_id WHERE user_id = ? and user_pass=?', [id,password], (error, rows) => {
-      if (error) {
+   // con.query('SELECT * FROM users u join user_role r on u.role_id=r.role_id WHERE user_id = ? and user_pass=?', [id,password], (error, rows) => {
+    con.query('SELECT u.*, r.role_name AS role_name, u.user_name AS user_name FROM users u join user_role r on u.role_id=r.role_id WHERE user_id = ? and user_pass=?', [id,password], (error, rows) => {  
+   if (error) {
         console.log(error);
         return res.status(500).json({ status: 'Internal server error' });
       }
@@ -66,7 +67,7 @@ router.post('/login', (req, res) => {
       }
       // At this point, the login is successful
       // You may generate a JWT token and return it to the client for future authentication
-      const token = jwt.sign({ user_id: user.id, role: user.role_name,user_name:user.user_name }, '4RMVRT/Gh6+V234f01BT7JwHYH2dHOSPNMo1T711jnAf3XjyNERkNLVlWcQH5yZ6bNOuAb0wxHYPNwEjJrBkKQhqZ8VL6jqDDURO92Cle8iyJjd8xSuMiI6HY5ruL+kbhtewFTtEHOz9IYUnpIOejuMPpbkgOjQ5ttu1c+3JbD8vRZNHUbRFZeri2QCEBD6fYJA4UpgioBEb8cbtna4cY3PlYYhChonn/4IYjIzhYPaIb+bwxDLgRF+C4GKXVUfU/158YcxV/8Ge77mvhAUE+h2jX2p9PkM8HJsI51yJCB42CHlEnukkpBVWqhgoPyYiaesTJNLbjNaxp14SEv23Rw==', { expiresIn: '24h' });  
+      const token = jwt.sign({ user_id: user.id, role_name: user.role_name,user_name:user.user_name }, '4RMVRT/Gh6+V234f01BT7JwHYH2dHOSPNMo1T711jnAf3XjyNERkNLVlWcQH5yZ6bNOuAb0wxHYPNwEjJrBkKQhqZ8VL6jqDDURO92Cle8iyJjd8xSuMiI6HY5ruL+kbhtewFTtEHOz9IYUnpIOejuMPpbkgOjQ5ttu1c+3JbD8vRZNHUbRFZeri2QCEBD6fYJA4UpgioBEb8cbtna4cY3PlYYhChonn/4IYjIzhYPaIb+bwxDLgRF+C4GKXVUfU/158YcxV/8Ge77mvhAUE+h2jX2p9PkM8HJsI51yJCB42CHlEnukkpBVWqhgoPyYiaesTJNLbjNaxp14SEv23Rw==', { expiresIn: '24h' });  
       console.log('token: '+ token);
       console.log(user);
       return res.status(200).json({ status: 'Login successful', token});

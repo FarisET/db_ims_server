@@ -26,7 +26,7 @@ var fs = require('fs');
 var con =mysql.createConnection({
     host:'localhost',
     user:'root',
-    password:'Root@123',
+    password:'-VGy$2jx',
     database:'test1',
 })
 
