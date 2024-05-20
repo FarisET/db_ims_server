@@ -1,6 +1,7 @@
 //var mysql= require('mysql');
 var mysql= require('mysql2');
 var fs = require('fs');
+require('dotenv').config();
 
 // var con =mysql.createConnection({
 //     host:'safifytestmysql.mysql.database.azure.com',
@@ -33,12 +34,11 @@ var fs = require('fs');
 
 //AVN database
 var con = mysql.createConnection({
-    host: 'mysql-18e3438a-smdkhatri1-8514.b.aivencloud.com',
-    //port: 16298,
-    user: 'avnadmin',
-    password: 'AVNS_8t46WmbqkiS0u79D1GI',
-    port: 16294,
-    database: 'test1',
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    port: process.env.DB_PORT,
+    database: process.env.DB_NAME,
     ssl: {
         rejectUnauthorized: true,
         ca: fs.readFileSync("./ca.pem").toString(),
